@@ -9,6 +9,7 @@
 ---
 
 ## General Info
+Project proposed by Bruce McMillin, ff@mst.edu, Professor of Computer Science
 
 This is a game designed for Android devices.  A multi-semester project at Missouri S&T for the CS4096/7 class.
 
