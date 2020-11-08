@@ -5,32 +5,34 @@ using UnityEngine;
 public class ClickDetection : MonoBehaviour
 {
     // Start is called before the first frame update
+    public int clicks = 0;
     void Start()
     {
       print(gameObject.name);
-
       gameObject.AddComponent<BoxCollider>();
+      var colorChanger = gameObject.GetComponent<Renderer>();
+      colorChanger.material.SetColor("_Color",Color.blue);
     }
 
     // Update is called once per frame
     void Update()
     {
-      /*
-      var colorChanger = gameObject.GetComponent<Renderer>();
-      if (Input.GetMouseButtonDown(0))
-        colorChanger.material.SetColor("_Color",Color.blue);
 
-      if (Input.GetMouseButtonDown(1))
-        colorChanger.material.SetColor("_Color",Color.green);
-
-      if (Input.GetMouseButtonDown(2))
-        colorChanger.material.SetColor("_Color",Color.yellow);
-        */
     }
-
+    //called when the gameObject is clicked on
     void OnMouseDown()
     {
-      var colorChanger = gameObject.GetComponent<Renderer>();
-      colorChanger.material.SetColor("_Color",Color.green);
+      if (clicks == 0)
+      {
+        var colorChanger = gameObject.GetComponent<Renderer>();
+        colorChanger.material.SetColor("_Color",Color.green);
+        clicks = 1;
+      }
+      else
+      {
+        var colorChanger = gameObject.GetComponent<Renderer>();
+        colorChanger.material.SetColor("_Color",Color.blue);
+        clicks = 0;
+      }
     }
 }
