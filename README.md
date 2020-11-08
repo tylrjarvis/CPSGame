@@ -41,6 +41,11 @@ This project was created using:
 ---
 
 ## External Links & Resources
+### Unity 3D - How To Install
+
+For this project, the program used was Unity3d and was coded in C#. We all used the Personal version of unity as it is free. When installing a new version of unity, make sure in the Platforms to install the WebGL Build Support.
+
+> https://unity3d.com/get-unity/download
 
 ### Photon 2
 The networking used to make this project multiplayer:
