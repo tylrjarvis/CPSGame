@@ -27,7 +27,7 @@ public class GameVariables : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        canvas.SetActive(false); 
+        canvas.SetActive(false);
         canvas2.SetActive(false);
         canvas3.SetActive(false);
         AttackerTurnStart();
@@ -75,11 +75,13 @@ public class GameVariables : MonoBehaviour
         attacksSelected = 0;
         oraclesPlaced = 0;
         observedObjects.Clear();
-
+        //TODO: Clean up to function call for each type of pipe
         GameObject[] sidewaysPipes;
         GameObject[] forwardPipes;
+        GameObject[] bendPipes;
         sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
         forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
+        bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
         foreach(GameObject pipe in sidewaysPipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
@@ -93,6 +95,18 @@ public class GameVariables : MonoBehaviour
             }
         }
         foreach (GameObject pipe in forwardPipes)
+        {
+            var changeMaterial = pipe.GetComponent<Renderer>();
+            if (pipe.GetComponent<PipeClick>().flow == 0)
+            {
+                changeMaterial.material.SetColor("_Color", Color.red);
+            }
+            else
+            {
+                changeMaterial.material = pipe1Material;
+            }
+        }
+        foreach (GameObject pipe in bendPipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
             if (pipe.GetComponent<PipeClick>().flow == 0)
@@ -127,11 +141,13 @@ public class GameVariables : MonoBehaviour
         oraclesPlaced = 0;
         observedObjects.Clear();
 
-
+        //TODO: Clean up to function call for each type of pipe
         GameObject[] sidewaysPipes;
         GameObject[] forwardPipes;
+        GameObject[] bendPipes;
         sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
         forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
+        bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
         foreach (GameObject pipe in sidewaysPipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
@@ -141,6 +157,14 @@ public class GameVariables : MonoBehaviour
             }
         }
         foreach (GameObject pipe in forwardPipes)
+        {
+            var changeMaterial = pipe.GetComponent<Renderer>();
+            if (pipe.GetComponent<PipeClick>().flow == 0)
+            {
+                changeMaterial.material = pipe1Material;
+            }
+        }
+        foreach (GameObject pipe in bendPipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
             if (pipe.GetComponent<PipeClick>().flow == 0)
@@ -173,11 +197,13 @@ public class GameVariables : MonoBehaviour
             tracked.GetComponent<PipeClick>().flow = 0;
 
         }
-
+        //TODO: Clean up to function calls for each type of pipe
         GameObject[] sidewaysPipes;
         GameObject[] forwardPipes;
+        GameObject[] bendPipes;
         sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
         forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
+        bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
         foreach (GameObject pipe in sidewaysPipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
@@ -187,6 +213,14 @@ public class GameVariables : MonoBehaviour
             }
         }
         foreach (GameObject pipe in forwardPipes)
+        {
+            var changeMaterial = pipe.GetComponent<Renderer>();
+            if (pipe.GetComponent<PipeClick>().flow == 0)
+            {
+                changeMaterial.material.SetColor("_Color", Color.red);
+            }
+        }
+        foreach (GameObject pipe in bendPipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
             if (pipe.GetComponent<PipeClick>().flow == 0)
