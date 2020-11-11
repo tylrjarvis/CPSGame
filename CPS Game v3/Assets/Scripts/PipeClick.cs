@@ -19,15 +19,16 @@ public class PipeClick : MonoBehaviour
     Vector3 spawnOracle;
     void Start()
     {
+      gameState = GameObject.Find("Gamestate");
       gameObject.AddComponent<BoxCollider>();
-      spawnOracle = transform.position;
-      spawnOracle.x = transform.position.x - 4;
+      spawnOracle = transform.position + Vector3.up*5;
+/*      spawnOracle.x = transform.position.x - 4;
       spawnOracle.y = transform.position.y - 5;
       if(gameObject.tag == "SidewaysPipe")
       {
           spawnOracle.x = transform.position.x;
           spawnOracle.z = transform.position.z+4;
-      }
+      }*/
     }
 
     // Update is called once per frame

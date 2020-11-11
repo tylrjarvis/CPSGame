@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameVariables : MonoBehaviour
 {
@@ -17,9 +18,9 @@ public class GameVariables : MonoBehaviour
     public GameObject canvas3;
     private bool waiting = false;
     public static List<GameObject> observedObjects = new List<GameObject>();
+    public List<GameObject> Pipes = new List<GameObject>();
     private bool defenderPostTurn = false;
-    public Material pipe1Material;
-    public Material pipe2Material;
+    public Material pipeMaterial;
 
     public static int attacksSelected = 0;
     private bool attackerPostTurn = false;
@@ -27,6 +28,18 @@ public class GameVariables : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+		SceneManager.GetActiveScene().GetRootGameObjects(Pipes);
+        for(int i = 0; i < Pipes.Count(); i++)
+        {
+            if(!Pipes[i].name.Contains("Pipe")){
+                Pipes.RemoveAt(i);
+                i--;
+            }
+            else
+            {
+                Pipes[i] = Pipes[i].transform.GetChild(0).gameObject;
+            }
+        }
         canvas.SetActive(false);
         canvas2.SetActive(false);
         canvas3.SetActive(false);
@@ -76,13 +89,7 @@ public class GameVariables : MonoBehaviour
         oraclesPlaced = 0;
         observedObjects.Clear();
         //TODO: Clean up to function call for each type of pipe
-        GameObject[] sidewaysPipes;
-        GameObject[] forwardPipes;
-        GameObject[] bendPipes;
-        sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
-        forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
-        bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
-        foreach(GameObject pipe in sidewaysPipes)
+        foreach(GameObject pipe in Pipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
             if (pipe.GetComponent<PipeClick>().broken == 0) //.broken instead
@@ -91,37 +98,12 @@ public class GameVariables : MonoBehaviour
             }
             else
             {
-                changeMaterial.material = pipe2Material;
-            }
-        }
-        foreach (GameObject pipe in forwardPipes)
-        {
-            var changeMaterial = pipe.GetComponent<Renderer>();
-            if (pipe.GetComponent<PipeClick>().broken == 0) //
-            {
-                changeMaterial.material.SetColor("_Color", Color.red);
-            }
-            else
-            {
-                changeMaterial.material = pipe1Material;
-            }
-        }
-        foreach (GameObject pipe in bendPipes)
-        {
-            var changeMaterial = pipe.GetComponent<Renderer>();
-            if (pipe.GetComponent<PipeClick>().broken == 0) //
-            {
-                changeMaterial.material.SetColor("_Color", Color.red);
-            }
-            else
-            {
-                changeMaterial.material = pipe1Material;
+                changeMaterial.material = pipeMaterial;
             }
         }
 
         GameObject[] oracles;
         oracles = GameObject.FindGameObjectsWithTag("Oracle");
-
         foreach(GameObject destroy in oracles)
         {
             Destroy(destroy);
@@ -142,34 +124,12 @@ public class GameVariables : MonoBehaviour
         observedObjects.Clear();
 
         //TODO: Clean up to function call for each type of pipe
-        GameObject[] sidewaysPipes;
-        GameObject[] forwardPipes;
-        GameObject[] bendPipes;
-        sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
-        forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
-        bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
-        foreach (GameObject pipe in sidewaysPipes)
+        foreach (GameObject pipe in Pipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
             if (pipe.GetComponent<PipeClick>().broken == 0) //.broken instead
             {
-                changeMaterial.material = pipe2Material;
-            }
-        }
-        foreach (GameObject pipe in forwardPipes)
-        {
-            var changeMaterial = pipe.GetComponent<Renderer>();
-            if (pipe.GetComponent<PipeClick>().broken == 0) //
-            {
-                changeMaterial.material = pipe1Material;
-            }
-        }
-        foreach (GameObject pipe in bendPipes)
-        {
-            var changeMaterial = pipe.GetComponent<Renderer>();
-            if (pipe.GetComponent<PipeClick>().broken == 0) //
-            {
-                changeMaterial.material = pipe1Material;
+                changeMaterial.material = pipeMaterial;
             }
         }
     }
@@ -195,16 +155,9 @@ public class GameVariables : MonoBehaviour
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
             tracked.GetComponent<PipeClick>().broken = 0;
-
         }
         //TODO: Clean up to function calls for each type of pipe
-        GameObject[] sidewaysPipes;
-        GameObject[] forwardPipes;
-        GameObject[] bendPipes;
-        sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
-        forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
-        bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
-        foreach (GameObject pipe in sidewaysPipes)
+        foreach (GameObject pipe in Pipes)
         {
             var changeMaterial = pipe.GetComponent<Renderer>();
             if (pipe.GetComponent<PipeClick>().broken == 0) //.broken instead
@@ -212,34 +165,16 @@ public class GameVariables : MonoBehaviour
                 changeMaterial.material.SetColor("_Color", Color.red);
             }
         }
-        foreach (GameObject pipe in forwardPipes)
-        {
-            var changeMaterial = pipe.GetComponent<Renderer>();
-            if (pipe.GetComponent<PipeClick>().broken == 0) //
-            {
-                changeMaterial.material.SetColor("_Color", Color.red);
-            }
-        }
-        foreach (GameObject pipe in bendPipes)
-        {
-            var changeMaterial = pipe.GetComponent<Renderer>();
-            if (pipe.GetComponent<PipeClick>().broken == 0) //
-            {
-                changeMaterial.material.SetColor("_Color", Color.red);
-            }
-        }
-        //combine all the pipes into 1 list
-        var allPipes = forwardPipes.Union(sidewaysPipes).Union(bendPipes);
         //This could be improved if the behavior of the foreach loop can be predicted
         //This nested foreach loop loops through all the pipes and determines which pipes have flow in them
-        foreach (GameObject pipe in allPipes)
+        foreach (GameObject pipe in Pipes)
         {
           //if this pipe is broken then there should be no flow
           if (pipe.GetComponent<PipeClick>().broken == 0)
           {
               pipe.GetComponent<PipeClick>().flow = 0;
               //set all downstream pipes to have no flow
-              foreach (GameObject otherPipe in allPipes)
+              foreach (GameObject otherPipe in Pipes)
               {
                 //determine if the current otherPipe is downstream of this pipe order inceases as you go downstream
                 if (pipe.GetComponent<PipeClick>().order < otherPipe.GetComponent<PipeClick>().order)
@@ -286,17 +221,8 @@ public class GameVariables : MonoBehaviour
         }
         if(fixedPipe)
         {
-          //gather all the pipes
-          GameObject[] sidewaysPipes;
-          GameObject[] forwardPipes;
-          GameObject[] bendPipes;
-          sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
-          forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
-          bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
-          //combine the pipes into 1 list for easy parsing
-          var allPipes = forwardPipes.Union(sidewaysPipes).Union(bendPipes);
           //allow flow in all nonbroken pipes to be corrected in the later nested foreach loop
-          foreach (GameObject pipe in allPipes)
+          foreach (GameObject pipe in Pipes)
           {
             //if the pipe is not broken there should be flow
             if (pipe.GetComponent<PipeClick>().broken == 1)
@@ -306,14 +232,14 @@ public class GameVariables : MonoBehaviour
           }
           //use the nested foreach loop in AttackerPost to determine the new flow
           //in the pipes given that at least 1 pipe was fixed
-          foreach (GameObject pipe in allPipes)
+          foreach (GameObject pipe in Pipes)
           {
             //if this pipe is broken then there should be no flow
             if (pipe.GetComponent<PipeClick>().broken == 0)
             {
                 pipe.GetComponent<PipeClick>().flow = 0;
                 //set all downstream pipes to have no flow
-                foreach (GameObject otherPipe in allPipes)
+                foreach (GameObject otherPipe in Pipes)
                 {
                   //determine if the current otherPipe is downstream of this pipe order inceases as you go downstream
                   if (pipe.GetComponent<PipeClick>().order < otherPipe.GetComponent<PipeClick>().order)
@@ -344,17 +270,13 @@ public class GameVariables : MonoBehaviour
         foreach (GameObject tracked in observedObjects)
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
-            if(tracked.tag == "SidewaysPipe")
+            if(tracked.tag.Contains("Pipe"))
             {
-                changeMaterial.material = pipe2Material;
+                changeMaterial.material = pipeMaterial;
             }
-            else if (tracked.tag == "ForwardPipe")
-            {
-                changeMaterial.material = pipe1Material;
-            }
+
             GameObject[] oracles;
             oracles = GameObject.FindGameObjectsWithTag("Oracle");
-
             foreach(GameObject destroy in oracles)
             {
                 Destroy(destroy);
@@ -369,13 +291,9 @@ public class GameVariables : MonoBehaviour
         foreach (GameObject tracked in observedObjects)
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
-            if (tracked.tag == "SidewaysPipe" && tracked.GetComponent<PipeClick>().flow == 1) //.broken
+            if (tracked.tag.Contains("Pipe") && tracked.GetComponent<PipeClick>().flow == 1) //.broken
             {
-                changeMaterial.material = pipe2Material;
-            }
-            else if (tracked.tag == "ForwardPipe" && tracked.GetComponent<PipeClick>().flow == 1) //
-            {
-                changeMaterial.material = pipe1Material;
+                changeMaterial.material = pipeMaterial;
             }
             attacksSelected = 0;
         }
