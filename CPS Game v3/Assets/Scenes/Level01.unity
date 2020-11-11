@@ -423,6 +423,8 @@ MonoBehaviour:
   Oracle: {fileID: 7419137672067091235, guid: 6a326aa26d92c124980002922ce78421, type: 3}
   gameState: {fileID: 892674542}
   flow: 1
+  broken: 1
+  order: 4
   myMaterial: {fileID: 2100000, guid: a53633a1c5ddda646b796684c5e3aad8, type: 2}
 --- !u!1 &697737767 stripped
 GameObject:
@@ -459,6 +461,8 @@ MonoBehaviour:
   Oracle: {fileID: 7419137672067091235, guid: 6a326aa26d92c124980002922ce78421, type: 3}
   gameState: {fileID: 892674542}
   flow: 1
+  broken: 1
+  order: 2
   myMaterial: {fileID: 2100000, guid: a53633a1c5ddda646b796684c5e3aad8, type: 2}
 --- !u!1 &892674542 stripped
 GameObject:
@@ -483,6 +487,11 @@ PrefabInstance:
       propertyPath: gameState
       value: 
       objectReference: {fileID: 892674542}
+    - target: {fileID: 3027033336637746205, guid: 4d00d1ee35eff1142b6d87707fd13c27,
+        type: 3}
+      propertyPath: order
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3281039133461571424, guid: 4d00d1ee35eff1142b6d87707fd13c27,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -888,6 +897,11 @@ PrefabInstance:
       propertyPath: gameState
       value: 
       objectReference: {fileID: 892674542}
+    - target: {fileID: 4605970480603697993, guid: 35dd53b54a23a024abab9adff9c3a57f,
+        type: 3}
+      propertyPath: order
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 35dd53b54a23a024abab9adff9c3a57f, type: 3}
 --- !u!1001 &1611926435044793875
@@ -1144,7 +1158,7 @@ PrefabInstance:
     - target: {fileID: 2209931517689402399, guid: 09fec8663db591541be5256aafc00282,
         type: 3}
       propertyPath: turns
-      value: 7
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 09fec8663db591541be5256aafc00282, type: 3}

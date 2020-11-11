@@ -12,6 +12,8 @@ public class PipeClick : MonoBehaviour
     public GameObject gameState;
     private GameObject myOracle = null;
     public int flow = 1;
+    public int broken = 1;
+    public int order = 1;
     private int selected = 0;
     public Material myMaterial;
     Vector3 spawnOracle;
