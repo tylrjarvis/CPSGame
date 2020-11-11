@@ -8,6 +8,8 @@ TagManager:
   - ForwardPipe
   - SidewaysPipe
   - Oracle
+  - BendPipe
+  - StartPipe
   layers:
   - Default
   - TransparentFX
