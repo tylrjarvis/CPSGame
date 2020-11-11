@@ -272,6 +272,7 @@ public class GameVariables : MonoBehaviour
 
     private void FixObjects()
     {
+        var fixedPipe = false;
         foreach (GameObject tracked in observedObjects)
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
@@ -280,38 +281,60 @@ public class GameVariables : MonoBehaviour
                 //fix the selected pipe
                 changeMaterial.material.SetColor("_Color", Color.green);
                 tracked.GetComponent<PipeClick>().broken = 1;
-
-                //reset the flow of all the other pipes if needed
-                //first gather all the pipes
-                GameObject[] sidewaysPipes;
-                GameObject[] forwardPipes;
-                GameObject[] bendPipes;
-                sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
-                forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
-                bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
-                //combine the pipes into 1 list for easy parsing
-                var allPipes = forwardPipes.Union(sidewaysPipes).Union(bendPipes);
-                //use the nested foreach loop in AttackerPost to determine the new flow
-                //in the pipes
-                foreach (GameObject pipe in allPipes)
+                fixedPipe = true;
+            }
+        }
+        if(fixedPipe)
+        {
+          //gather all the pipes
+          GameObject[] sidewaysPipes;
+          GameObject[] forwardPipes;
+          GameObject[] bendPipes;
+          sidewaysPipes = GameObject.FindGameObjectsWithTag("SidewaysPipe");
+          forwardPipes = GameObject.FindGameObjectsWithTag("ForwardPipe");
+          bendPipes = GameObject.FindGameObjectsWithTag("BendPipe");
+          //combine the pipes into 1 list for easy parsing
+          var allPipes = forwardPipes.Union(sidewaysPipes).Union(bendPipes);
+          //allow flow in all nonbroken pipes to be corrected in the later nested foreach loop
+          foreach (GameObject pipe in allPipes)
+          {
+            //if the pipe is not broken there should be flow
+            if (pipe.GetComponent<PipeClick>().broken == 1)
+            {
+              pipe.GetComponent<PipeClick>().flow = 1;
+            }
+          }
+          //use the nested foreach loop in AttackerPost to determine the new flow
+          //in the pipes given that at least 1 pipe was fixed
+          foreach (GameObject pipe in allPipes)
+          {
+            //if this pipe is broken then there should be no flow
+            if (pipe.GetComponent<PipeClick>().broken == 0)
+            {
+                pipe.GetComponent<PipeClick>().flow = 0;
+                //set all downstream pipes to have no flow
+                foreach (GameObject otherPipe in allPipes)
                 {
-                  //if this pipe is broken then there should be no flow
-                  if (pipe.GetComponent<PipeClick>().broken == 0)
+                  //determine if the current otherPipe is downstream of this pipe order inceases as you go downstream
+                  if (pipe.GetComponent<PipeClick>().order < otherPipe.GetComponent<PipeClick>().order)
                   {
-                      pipe.GetComponent<PipeClick>().flow = 0;
-                      //set all downstream pipes to have no flow
-                      foreach (GameObject otherPipe in allPipes)
-                      {
-                        //determine if the current otherPipe is downstream of this pipe order inceases as you go downstream
-                        if (pipe.GetComponent<PipeClick>().order < otherPipe.GetComponent<PipeClick>().order)
-                        {
-                            otherPipe.GetComponent<PipeClick>().flow = 0;
-                        }
-                      }
+                      otherPipe.GetComponent<PipeClick>().flow = 0;
                   }
                 }
             }
+          }
+
+          //reset the color of the pipes to updated flow measurements
+          foreach (GameObject tracked in observedObjects)
+          {
+            var changeMaterial = tracked.GetComponent<Renderer>();
+            if (tracked.GetComponent<PipeClick>().flow == 1)
+            {
+              changeMaterial.material.SetColor("_Color", Color.green);
+            }
+          }
         }
+
         canvas2.SetActive(true);
 
     }
