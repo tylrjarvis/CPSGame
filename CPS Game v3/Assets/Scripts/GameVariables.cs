@@ -52,6 +52,7 @@ public class GameVariables : MonoBehaviour
         if(turns <= 0)
         {
             canvas3.SetActive(true);
+            SceneManager.LoadScene("_MenuScreen");
         }
         if (oraclesPlaced == 2 && defenderPostTurn == false)
         {
@@ -273,6 +274,7 @@ public class GameVariables : MonoBehaviour
             if(tracked.tag.Contains("Pipe"))
             {
                 changeMaterial.material = pipeMaterial;
+                //changeMaterial.material.SetColor("_Color", Color.green);
             }
 
             GameObject[] oracles;
@@ -291,7 +293,7 @@ public class GameVariables : MonoBehaviour
         foreach (GameObject tracked in observedObjects)
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
-            if (tracked.tag.Contains("Pipe") && tracked.GetComponent<PipeClick>().flow == 1) //.broken
+            if (tracked.tag.Contains("Pipe") && tracked.GetComponent<PipeClick>().flow == 0) //.broken
             {
                 changeMaterial.material = pipeMaterial;
             }
