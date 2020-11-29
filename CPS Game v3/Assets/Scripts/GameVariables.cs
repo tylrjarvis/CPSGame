@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms;
 
 public class GameVariables : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class GameVariables : MonoBehaviour
     public List<GameObject> Pipes = new List<GameObject>();
     private bool defenderPostTurn = false;
     public Material pipeMaterial;
+
+    private Dictionary<int, List<int>> pipegraph = new Dictionary<int, List<int>>();
 
     public static int attacksSelected = 0;
     private bool attackerPostTurn = false;
@@ -40,6 +43,13 @@ public class GameVariables : MonoBehaviour
                 Pipes[i] = Pipes[i].transform.GetChild(0).gameObject;
             }
         }
+
+        // build the pipe network
+        foreach (GameObject pipe in Pipes)
+        {
+            pipegraph.Add(pipe.GetComponent<PipeClick>().order, pipe.GetComponent<PipeClick>().neighbors);
+        }
+
         canvas.SetActive(false);
         canvas2.SetActive(false);
         canvas3.SetActive(false);
@@ -168,23 +178,7 @@ public class GameVariables : MonoBehaviour
         }
         //This could be improved if the behavior of the foreach loop can be predicted
         //This nested foreach loop loops through all the pipes and determines which pipes have flow in them
-        foreach (GameObject pipe in Pipes)
-        {
-          //if this pipe is broken then there should be no flow
-          if (pipe.GetComponent<PipeClick>().broken == 0)
-          {
-              pipe.GetComponent<PipeClick>().flow = 0;
-              //set all downstream pipes to have no flow
-              foreach (GameObject otherPipe in Pipes)
-              {
-                //determine if the current otherPipe is downstream of this pipe order inceases as you go downstream
-                if (pipe.GetComponent<PipeClick>().order < otherPipe.GetComponent<PipeClick>().order)
-                {
-                    otherPipe.GetComponent<PipeClick>().flow = 0;
-                }
-              }
-          }
-        }
+        UpdateFlow();
     }
 
     public void DefenderPost()
@@ -222,19 +216,40 @@ public class GameVariables : MonoBehaviour
         }
         if(fixedPipe)
         {
-          //allow flow in all nonbroken pipes to be corrected in the later nested foreach loop
-          foreach (GameObject pipe in Pipes)
-          {
-            //if the pipe is not broken there should be flow
-            if (pipe.GetComponent<PipeClick>().broken == 1)
+            //allow flow in all nonbroken pipes to be corrected in the later nested foreach loop
+            foreach (GameObject pipe in Pipes)
             {
-              pipe.GetComponent<PipeClick>().flow = 1;
+                //if the pipe is not broken there should be flow
+                if (pipe.GetComponent<PipeClick>().broken == 1)
+                {
+                  pipe.GetComponent<PipeClick>().flow = 1;
+                }
             }
-          }
-          //use the nested foreach loop in AttackerPost to determine the new flow
-          //in the pipes given that at least 1 pipe was fixed
-          foreach (GameObject pipe in Pipes)
-          {
+            //use the nested foreach loop in AttackerPost to determine the new flow
+            //in the pipes given that at least 1 pipe was fixed
+            UpdateFlow();
+
+            //reset the color of the pipes to updated flow measurements
+            foreach (GameObject tracked in observedObjects)
+            {
+                var changeMaterial = tracked.GetComponent<Renderer>();
+                if (tracked.GetComponent<PipeClick>().flow == 1)
+                {
+                  changeMaterial.material.SetColor("_Color", Color.green);
+                }
+            }
+        }
+
+        canvas2.SetActive(true);
+
+    }
+
+
+    bool[] visited;
+    private void UpdateFlow()
+    {
+        foreach (GameObject pipe in Pipes)
+        {
             //if this pipe is broken then there should be no flow
             if (pipe.GetComponent<PipeClick>().broken == 0)
             {
@@ -242,29 +257,75 @@ public class GameVariables : MonoBehaviour
                 //set all downstream pipes to have no flow
                 foreach (GameObject otherPipe in Pipes)
                 {
-                  //determine if the current otherPipe is downstream of this pipe order inceases as you go downstream
-                  if (pipe.GetComponent<PipeClick>().order < otherPipe.GetComponent<PipeClick>().order)
-                  {
-                      otherPipe.GetComponent<PipeClick>().flow = 0;
-                  }
+                    //determine if the current otherPipe is downstream of this pipe order inceases as you go downstream
+                    if (pipe.GetComponent<PipeClick>().order < otherPipe.GetComponent<PipeClick>().order)
+                    {
+                        otherPipe.GetComponent<PipeClick>().flow = 0;
+                    }
                 }
             }
-          }
-
-          //reset the color of the pipes to updated flow measurements
-          foreach (GameObject tracked in observedObjects)
-          {
-            var changeMaterial = tracked.GetComponent<Renderer>();
-            if (tracked.GetComponent<PipeClick>().flow == 1)
-            {
-              changeMaterial.material.SetColor("_Color", Color.green);
-            }
-          }
         }
-
-        canvas2.SetActive(true);
-
+        // initiate to false
+        for (int i = 0; i < Pipes.Count(); i++)
+        {
+            visited[i] = false;
+        }
+        // find all pipes connected to pipe 1
+        GraphDFS(1);
+        /*
+         * void Graph::connectedComponents()
+            {
+                // Mark all the vertices as not visited
+                bool* visited = new bool[V];
+                for (int v = 0; v < V; v++)
+                    visited[v] = false;
+ 
+                for (int v = 0; v < V; v++) {
+                    if (visited[v] == false) {
+                        // print all reachable vertices
+                        // from v
+                        DFSUtil(v, visited);
+ 
+                        cout << "\n";
+                    }
+                }
+                delete[] visited;
+            }
+ 
+            void Graph::DFSUtil(int v, bool visited[])
+            {
+                // Mark the current node as visited and print it
+                visited[v] = true;
+                cout << v << " ";
+ 
+                // Recur for all the vertices
+                // adjacent to this vertex
+                list<int>::iterator i;
+                for (i = adj[v].begin(); i != adj[v].end(); ++i)
+                    if (!visited[*i])
+                        DFSUtil(*i, visited);
+            }
+         */
     }
+
+    private int GraphDFS()
+    {
+        /*// have to use pointers because we need the pass by refernce
+        visited[v] = true;
+        // replace cout with insert into insertion
+        connected.push_back(v);
+
+        int i = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            if (visited[i] == false)
+            {
+                connected = GraphDFS(i, visited, connected);
+            }
+        }*/
+        return 0;
+    }
+
 
     public void ResetDefenderTurn()
     {
@@ -293,7 +354,7 @@ public class GameVariables : MonoBehaviour
         foreach (GameObject tracked in observedObjects)
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
-            if (tracked.tag.Contains("Pipe") && tracked.GetComponent<PipeClick>().flow == 0) //.broken
+            if (tracked.tag.Contains("Pipe") && tracked.GetComponent<PipeClick>().flow == 1) //.broken
             {
                 changeMaterial.material = pipeMaterial;
             }
