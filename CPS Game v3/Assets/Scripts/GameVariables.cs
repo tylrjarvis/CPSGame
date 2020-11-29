@@ -62,7 +62,7 @@ public class GameVariables : MonoBehaviour
         if(turns <= 0)
         {
             canvas3.SetActive(true);
-            SceneManager.LoadScene("_MenuScreen");
+            Invoke("End", _time);
         }
         if (oraclesPlaced == 2 && defenderPostTurn == false)
         {
@@ -86,6 +86,12 @@ public class GameVariables : MonoBehaviour
             }
         }
     }
+
+    private void End()
+    {
+        SceneManager.LoadScene("_MenuScreen");
+    }
+
     public void AttackerTurnStart()
     {
         playerTurn--;
@@ -174,6 +180,8 @@ public class GameVariables : MonoBehaviour
             if (pipe.GetComponent<PipeClick>().broken == 0) //.broken instead
             {
                 changeMaterial.material.SetColor("_Color", Color.red);
+                pipegraph[pipe.GetComponent<PipeClick>().order].Clear();
+                //pipegraph[pipe.GetComponent<PipeClick>().order] = new List<int>();
             }
         }
         //This could be improved if the behavior of the foreach loop can be predicted
@@ -212,6 +220,7 @@ public class GameVariables : MonoBehaviour
                 changeMaterial.material.SetColor("_Color", Color.green);
                 tracked.GetComponent<PipeClick>().broken = 1;
                 fixedPipe = true;
+                pipegraph[tracked.GetComponent<PipeClick>().order] = tracked.GetComponent<PipeClick>().neighbors;
             }
         }
         if(fixedPipe)
@@ -245,85 +254,49 @@ public class GameVariables : MonoBehaviour
     }
 
 
-    bool[] visited;
+    // need to use lists because array is of fixed size
+    private List<bool> visited = new List<bool>();
+    private List<int> connected = new List<int>();
     private void UpdateFlow()
     {
-        foreach (GameObject pipe in Pipes)
-        {
-            //if this pipe is broken then there should be no flow
-            if (pipe.GetComponent<PipeClick>().broken == 0)
-            {
-                pipe.GetComponent<PipeClick>().flow = 0;
-                //set all downstream pipes to have no flow
-                foreach (GameObject otherPipe in Pipes)
-                {
-                    //determine if the current otherPipe is downstream of this pipe order inceases as you go downstream
-                    if (pipe.GetComponent<PipeClick>().order < otherPipe.GetComponent<PipeClick>().order)
-                    {
-                        otherPipe.GetComponent<PipeClick>().flow = 0;
-                    }
-                }
-            }
-        }
         // initiate to false
+        visited.Clear();
         for (int i = 0; i < Pipes.Count(); i++)
         {
-            visited[i] = false;
+            visited.Add(false);
         }
-        // find all pipes connected to pipe 1
-        GraphDFS(1);
-        /*
-         * void Graph::connectedComponents()
-            {
-                // Mark all the vertices as not visited
-                bool* visited = new bool[V];
-                for (int v = 0; v < V; v++)
-                    visited[v] = false;
- 
-                for (int v = 0; v < V; v++) {
-                    if (visited[v] == false) {
-                        // print all reachable vertices
-                        // from v
-                        DFSUtil(v, visited);
- 
-                        cout << "\n";
-                    }
-                }
-                delete[] visited;
+        connected.Clear();
+
+        // find all pipes connected to pipe 0
+        GraphDFS(0);
+
+        foreach (GameObject pipe in Pipes)
+        {
+            // only connected pipes have flow
+            if (connected.Contains(pipe.GetComponent<PipeClick>().order)) {
+                pipe.GetComponent<PipeClick>().flow = 1;
             }
- 
-            void Graph::DFSUtil(int v, bool visited[])
-            {
-                // Mark the current node as visited and print it
-                visited[v] = true;
-                cout << v << " ";
- 
-                // Recur for all the vertices
-                // adjacent to this vertex
-                list<int>::iterator i;
-                for (i = adj[v].begin(); i != adj[v].end(); ++i)
-                    if (!visited[*i])
-                        DFSUtil(*i, visited);
+            else {
+                pipe.GetComponent<PipeClick>().flow = 0;
             }
-         */
+        }
+
+        // dont forget to add the parts where pipegraph is emptied or refilled when a pipe is fixed or busted
     }
 
-    private int GraphDFS()
+    private void GraphDFS(int v)
     {
-        /*// have to use pointers because we need the pass by refernce
         visited[v] = true;
-        // replace cout with insert into insertion
-        connected.push_back(v);
+        connected.Add(v);
 
-        int i = 0;
-        for (int i = 0; i < 8; i++)
+        // try for each unvisited neighbor
+        foreach (int i in pipegraph[v])
         {
             if (visited[i] == false)
             {
-                connected = GraphDFS(i, visited, connected);
+                GraphDFS(i);
             }
-        }*/
-        return 0;
+        }
     }
 
 
