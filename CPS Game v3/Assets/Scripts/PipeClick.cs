@@ -14,7 +14,8 @@ public class PipeClick : MonoBehaviour
     public int flow = 1;
     public int broken = 1;
     // using order for the nodes and neighbors for the edges in the pipe system
-    public int order = 1;
+    // order needs to start at 0 to work
+    public int order = 0;
     public List<int> neighbors = new List<int>();
     private int selected = 0;
     public Material myMaterial;

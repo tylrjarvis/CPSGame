@@ -332,6 +332,11 @@ PrefabInstance:
       propertyPath: myMaterial
       value: 
       objectReference: {fileID: 2100000, guid: a53633a1c5ddda646b796684c5e3aad8, type: 2}
+    - target: {fileID: 4548025045567630449, guid: 638d6ed1b05f091d28ac28b95a084fcc,
+        type: 3}
+      propertyPath: neighbors.Array.data[2]
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 6283952785422956580, guid: 638d6ed1b05f091d28ac28b95a084fcc,
         type: 3}
       propertyPath: m_Name
@@ -860,6 +865,11 @@ PrefabInstance:
       propertyPath: myMaterial
       value: 
       objectReference: {fileID: 2100000, guid: a53633a1c5ddda646b796684c5e3aad8, type: 2}
+    - target: {fileID: 4548025045567630449, guid: 638d6ed1b05f091d28ac28b95a084fcc,
+        type: 3}
+      propertyPath: neighbors.Array.data[1]
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6283952785422956580, guid: 638d6ed1b05f091d28ac28b95a084fcc,
         type: 3}
       propertyPath: m_Name

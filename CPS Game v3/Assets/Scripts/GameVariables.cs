@@ -47,7 +47,7 @@ public class GameVariables : MonoBehaviour
         // build the pipe network
         foreach (GameObject pipe in Pipes)
         {
-            pipegraph.Add(pipe.GetComponent<PipeClick>().order, pipe.GetComponent<PipeClick>().neighbors);
+            pipegraph.Add(pipe.GetComponent<PipeClick>().order, new List<int>(pipe.GetComponent<PipeClick>().neighbors));
         }
 
         canvas.SetActive(false);
@@ -185,7 +185,8 @@ public class GameVariables : MonoBehaviour
             }
         }
         //This could be improved if the behavior of the foreach loop can be predicted
-        //This nested foreach loop loops through all the pipes and determines which pipes have flow in them
+
+        // determine which pipes have flow in them
         UpdateFlow();
     }
 
@@ -220,7 +221,7 @@ public class GameVariables : MonoBehaviour
                 changeMaterial.material.SetColor("_Color", Color.green);
                 tracked.GetComponent<PipeClick>().broken = 1;
                 fixedPipe = true;
-                pipegraph[tracked.GetComponent<PipeClick>().order] = tracked.GetComponent<PipeClick>().neighbors;
+                pipegraph[tracked.GetComponent<PipeClick>().order] = new List<int>(tracked.GetComponent<PipeClick>().neighbors);
             }
         }
         if(fixedPipe)
@@ -270,14 +271,24 @@ public class GameVariables : MonoBehaviour
         // find all pipes connected to pipe 0
         GraphDFS(0);
 
-        foreach (GameObject pipe in Pipes)
+        // if source broken none of the pipes have flow
+        if (pipegraph[0].Count == 0)
         {
-            // only connected pipes have flow
-            if (connected.Contains(pipe.GetComponent<PipeClick>().order)) {
-                pipe.GetComponent<PipeClick>().flow = 1;
-            }
-            else {
+            foreach (GameObject pipe in Pipes) {
                 pipe.GetComponent<PipeClick>().flow = 0;
+            }
+        }
+        else
+        {
+            foreach (GameObject pipe in Pipes)
+            {
+                // only connected pipes have flow
+                if (connected.Contains(pipe.GetComponent<PipeClick>().order)) {
+                    pipe.GetComponent<PipeClick>().flow = 1;
+                }
+                else {
+                    pipe.GetComponent<PipeClick>().flow = 0;
+                }
             }
         }
 
