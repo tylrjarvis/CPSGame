@@ -128,6 +128,8 @@ public class PipeClick : MonoBehaviour
             changeMaterial.material.SetColor("_Color", Color.green);
             myOracle = Instantiate(Oracle, spawnOracle, Quaternion.identity);
             myOracle.transform.parent = transform;
+			myOracle.transform.Rotate(Vector3.up*180.0f);
+			myOracle.transform.Translate(Vector3.down);
             GameVariables.oraclesPlaced++;
             GameVariables.observedObjects.Add(gameObject);
         }
