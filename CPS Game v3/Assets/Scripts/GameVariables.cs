@@ -4,9 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms;
+using UnityEngine.UI;
 
 public class GameVariables : MonoBehaviour
 {
@@ -22,6 +24,7 @@ public class GameVariables : MonoBehaviour
     public List<GameObject> Pipes = new List<GameObject>();
     private bool defenderPostTurn = false;
     public Material pipeMaterial;
+    private GameObject tank;
 
     private Dictionary<int, List<int>> pipegraph = new Dictionary<int, List<int>>();
 
@@ -41,6 +44,11 @@ public class GameVariables : MonoBehaviour
             else
             {
                 Pipes[i] = Pipes[i].transform.GetChild(0).gameObject;
+                if (Pipes[i].name.Contains("Tank"))
+                {
+                    Pipes[i].GetComponent<PipeClick>().isTank = true;
+                    tank = Pipes[i];
+                }
             }
         }
 
@@ -62,6 +70,15 @@ public class GameVariables : MonoBehaviour
         if(turns <= 0)
         {
             canvas3.SetActive(true);
+            Text message = GameObject.Find("WinMessage").GetComponentInChildren<Text>();
+            if (tank.GetComponent<PipeClick>().broken == 1)
+            {
+                message.text = "Attacker Wins";
+            }
+            else
+            {
+                message.text = "Defender Wins";
+            }
             Invoke("End", _time);
         }
         if (oraclesPlaced == 2 && defenderPostTurn == false)

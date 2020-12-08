@@ -13,6 +13,7 @@ public class PipeClick : MonoBehaviour
     private GameObject myOracle = null;
     public int flow = 1;
     public int broken = 1;
+    public bool isTank = false;
     // using order for the nodes and neighbors for the edges in the pipe system
     // order needs to start at 0 to work
     public int order = 0;
@@ -57,81 +58,88 @@ public class PipeClick : MonoBehaviour
 
     void AttackerClicked()
     {
-        //true if object was previously selected
-        if (gameObject.GetComponent<Renderer>().material.color == Color.green)
+        // attacker cannot target tank
+        if (!isTank)
         {
-            selected = 1;
-        }
-        else
-        {
-            selected = 0;
-        }
-        //if the object was previously selected remove if from the list of objects
-        //that the game logic(GameVariables.cs) looks at
-        if (selected == 1)
-        {
-            GameVariables.attacksSelected--;
-            var changeMaterial = gameObject.GetComponent<Renderer>();
-            changeMaterial.material = myMaterial;
-            for (int i = 0; i < GameVariables.observedObjects.Count; i++)
+            //true if object was previously selected
+            if (gameObject.GetComponent<Renderer>().material.color == Color.green)
             {
-                if (GameVariables.observedObjects[i].GetInstanceID() == gameObject.GetInstanceID())
-                {
-                    GameVariables.observedObjects.RemoveAt(i);
-                }
+                selected = 1;
             }
-            selected = 0;
-        }
-        //if it is now selected add it to the list of objects for the game logic to act on
-        else if (GameVariables.attacksSelected < 1 && selected == 0 && gameObject.GetComponent<Renderer>().material.color != Color.red)
-        {
-            selected = 1;
-            var changeMaterial = gameObject.GetComponent<Renderer>();
-            changeMaterial.material.SetColor("_Color", Color.green);
-            GameVariables.attacksSelected++;
-            GameVariables.observedObjects.Add(gameObject);
+            else
+            {
+                selected = 0;
+            }
+            //if the object was previously selected remove if from the list of objects
+            //that the game logic(GameVariables.cs) looks at
+            if (selected == 1)
+            {
+                GameVariables.attacksSelected--;
+                var changeMaterial = gameObject.GetComponent<Renderer>();
+                changeMaterial.material = myMaterial;
+                for (int i = 0; i < GameVariables.observedObjects.Count; i++)
+                {
+                    if (GameVariables.observedObjects[i].GetInstanceID() == gameObject.GetInstanceID())
+                    {
+                        GameVariables.observedObjects.RemoveAt(i);
+                    }
+                }
+                selected = 0;
+            }
+            //if it is now selected add it to the list of objects for the game logic to act on
+            else if (GameVariables.attacksSelected < 1 && selected == 0 && gameObject.GetComponent<Renderer>().material.color != Color.red)
+            {
+                selected = 1;
+                var changeMaterial = gameObject.GetComponent<Renderer>();
+                changeMaterial.material.SetColor("_Color", Color.green);
+                GameVariables.attacksSelected++;
+                GameVariables.observedObjects.Add(gameObject);
+            }
         }
     }
 
     void DefenderClicked()
     {
-        if (gameObject.GetComponent<Renderer>().material.color == Color.green)
+        if (!isTank)
         {
-            selected = 1;
-        }
-        else
-        {
-            selected = 0;
-        }
-        //if the object was previously selected remove if from the list of objects
-        //that the game logic(GameVariables.cs) looks at
-        if (selected == 1)
-        {
-            Destroy(myOracle);
-            GameVariables.oraclesPlaced--;
-            var changeMaterial = gameObject.GetComponent<Renderer>();
-            changeMaterial.material = myMaterial;
-            for (int i = 0; i < GameVariables.observedObjects.Count; i++)
+            if (gameObject.GetComponent<Renderer>().material.color == Color.green)
             {
-                if (GameVariables.observedObjects[i].GetInstanceID() == gameObject.GetInstanceID())
-                {
-                    GameVariables.observedObjects.RemoveAt(i);
-                }
+                selected = 1;
             }
-            selected = 0;
-        }
-        //if it is now selected add it to the list of objects for the game logic to act on
-        else if (GameVariables.oraclesPlaced < 2 && selected == 0)
-        {
-            selected = 1;
-            var changeMaterial = gameObject.GetComponent<Renderer>();
-            changeMaterial.material.SetColor("_Color", Color.green);
-            myOracle = Instantiate(Oracle, spawnOracle, Quaternion.identity);
-            myOracle.transform.parent = transform;
-			myOracle.transform.Rotate(Vector3.up*180.0f);
-			myOracle.transform.Translate(Vector3.down);
-            GameVariables.oraclesPlaced++;
-            GameVariables.observedObjects.Add(gameObject);
+            else
+            {
+                selected = 0;
+            }
+            //if the object was previously selected remove if from the list of objects
+            //that the game logic(GameVariables.cs) looks at
+            if (selected == 1)
+            {
+                Destroy(myOracle);
+                GameVariables.oraclesPlaced--;
+                var changeMaterial = gameObject.GetComponent<Renderer>();
+                changeMaterial.material = myMaterial;
+                for (int i = 0; i < GameVariables.observedObjects.Count; i++)
+                {
+                    if (GameVariables.observedObjects[i].GetInstanceID() == gameObject.GetInstanceID())
+                    {
+                        GameVariables.observedObjects.RemoveAt(i);
+                    }
+                }
+                selected = 0;
+            }
+            //if it is now selected add it to the list of objects for the game logic to act on
+            else if (GameVariables.oraclesPlaced < 2 && selected == 0)
+            {
+                selected = 1;
+                var changeMaterial = gameObject.GetComponent<Renderer>();
+                changeMaterial.material.SetColor("_Color", Color.green);
+                myOracle = Instantiate(Oracle, spawnOracle, Quaternion.identity);
+                myOracle.transform.parent = transform;
+                myOracle.transform.Rotate(Vector3.up * 180.0f);
+                myOracle.transform.Translate(Vector3.down);
+                GameVariables.oraclesPlaced++;
+                GameVariables.observedObjects.Add(gameObject);
+            }
         }
     }
 
