@@ -71,7 +71,7 @@ public class GameVariables : MonoBehaviour
         {
             canvas3.SetActive(true);
             Text message = GameObject.Find("WinMessage").GetComponentInChildren<Text>();
-            if (tank.GetComponent<PipeClick>().broken == 1)
+            if (tank.GetComponent<PipeClick>().flow == 0)
             {
                 message.text = "Attacker Wins";
             }
