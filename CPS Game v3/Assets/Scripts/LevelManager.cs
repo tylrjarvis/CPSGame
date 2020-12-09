@@ -16,7 +16,15 @@ public class LevelManager : MonoBehaviour
     }
     public void OnClickStart()
     {
+        SceneManager.LoadScene("Level_Select");
+    }
+    public void OnClickLevel1()
+    {
         SceneManager.LoadScene("Level01");
+    }
+    public void OnClickLevel2()
+    {
+        SceneManager.LoadScene("Level02");
     }
     public void OnClickExit()
     {

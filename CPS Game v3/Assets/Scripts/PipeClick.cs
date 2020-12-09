@@ -20,6 +20,7 @@ public class PipeClick : MonoBehaviour
     public List<int> neighbors = new List<int>();
     private int selected = 0;
     public Material myMaterial;
+    public Material filterMaterial;
     Vector3 spawnOracle;
     void Start()
     {
@@ -59,7 +60,7 @@ public class PipeClick : MonoBehaviour
     void AttackerClicked()
     {
         // attacker cannot target tank
-        if (!isTank)
+        if (!isTank && GameObject.FindGameObjectWithTag("GameState").GetComponent<GameVariables>().freeze == false)
         {
             //true if object was previously selected
             if (gameObject.GetComponent<Renderer>().material.color == Color.green)
@@ -100,7 +101,7 @@ public class PipeClick : MonoBehaviour
 
     void DefenderClicked()
     {
-        if (!isTank)
+        if (!isTank && GameObject.FindGameObjectWithTag("GameState").GetComponent<GameVariables>().freeze == false)
         {
             if (gameObject.GetComponent<Renderer>().material.color == Color.green)
             {
@@ -112,7 +113,7 @@ public class PipeClick : MonoBehaviour
             }
             //if the object was previously selected remove if from the list of objects
             //that the game logic(GameVariables.cs) looks at
-            if (selected == 1)
+            if (selected == 1 && GameObject.FindGameObjectWithTag("GameState").GetComponent<GameVariables>().freeze == false)
             {
                 Destroy(myOracle);
                 GameVariables.oraclesPlaced--;
@@ -134,6 +135,15 @@ public class PipeClick : MonoBehaviour
                 var changeMaterial = gameObject.GetComponent<Renderer>();
                 changeMaterial.material.SetColor("_Color", Color.green);
                 myOracle = Instantiate(Oracle, spawnOracle, Quaternion.identity);
+                if (gameObject.tag == "Filter")
+                {
+                    myOracle.transform.parent = transform;
+                    myOracle.transform.position += Vector3.up * 3.0f;
+                }
+                else
+                {
+                    myOracle.transform.parent = transform;
+                }
                 myOracle.transform.parent = transform;
                 myOracle.transform.Rotate(Vector3.up * 180.0f);
                 myOracle.transform.Translate(Vector3.down);

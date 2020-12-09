@@ -19,11 +19,15 @@ public class GameVariables : MonoBehaviour
     public GameObject canvas;
     public GameObject canvas2;
     public GameObject canvas3;
+    public GameObject canvas4;
+    public bool freeze = false;
+    bool filterBroke = false;
     private bool waiting = false;
     public static List<GameObject> observedObjects = new List<GameObject>();
     public List<GameObject> Pipes = new List<GameObject>();
     private bool defenderPostTurn = false;
     public Material pipeMaterial;
+    public Material filterMaterial;
     private GameObject tank;
 
     private Dictionary<int, List<int>> pipegraph = new Dictionary<int, List<int>>();
@@ -61,22 +65,31 @@ public class GameVariables : MonoBehaviour
         canvas.SetActive(false);
         canvas2.SetActive(false);
         canvas3.SetActive(false);
+        canvas4.SetActive(false);
         AttackerTurnStart();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(turns <= 0)
+        if (turns <= 0)
         {
+            canvas4.SetActive(false);
             canvas3.SetActive(true);
             Text message = GameObject.Find("WinMessage").GetComponentInChildren<Text>();
             if (tank.GetComponent<PipeClick>().flow == 0)
             {
-                message.text = "Attacker Wins";
+                message.color = Color.red;
+                message.text = "Attacker Wins! There was no water flow to the tank!";
+            }
+            else if (filterBroke)
+            {
+                message.color = Color.red;
+                message.text = "Attacker Wins! There was flow to the tank, but the water wasn't filtered!";
             }
             else
             {
+                message.color = Color.blue;
                 message.text = "Defender Wins";
             }
             Invoke("End", _time);
@@ -111,6 +124,14 @@ public class GameVariables : MonoBehaviour
 
     public void AttackerTurnStart()
     {
+        freeze = true;
+        canvas4.SetActive(true);
+        Text message = GameObject.Find("StartTurn").GetComponentInChildren<Text>();
+        message.text = "Attacker's Turn\n Turns Left: " + turns;
+        message.color = Color.red;
+
+        Invoke("StartTurnScreen", _time);
+
         playerTurn--;
         print("Attacker turn starting...");
         print("Turns left: " + turns);
@@ -135,6 +156,16 @@ public class GameVariables : MonoBehaviour
                 changeMaterial.material = pipeMaterial;
             }
         }
+        if (filterBroke == true)
+        {
+            var changeMaterial = GameObject.FindGameObjectWithTag("Filter").GetComponent<Renderer>();
+            changeMaterial.material.SetColor("_Color", Color.red);
+        }
+        else
+        {
+            var changeMaterial = GameObject.FindGameObjectWithTag("Filter").GetComponent<Renderer>();
+            changeMaterial.material = filterMaterial;
+        }
 
         GameObject[] oracles;
         oracles = GameObject.FindGameObjectsWithTag("Oracle");
@@ -147,6 +178,14 @@ public class GameVariables : MonoBehaviour
 
     private void DefenderTurnStart()
     {
+        freeze = true;
+        canvas4.SetActive(true);
+        Text message = GameObject.Find("StartTurn").GetComponentInChildren<Text>();
+        message.text = "Defender's Turn\n Turns Left: " + turns;
+        message.color = Color.blue;
+
+        Invoke("StartTurnScreen", _time);
+
         playerTurn++;
         defenderPostTurn = false;
         attackerPostTurn = false;
@@ -166,6 +205,9 @@ public class GameVariables : MonoBehaviour
                 changeMaterial.material = pipeMaterial;
             }
         }
+        GameObject filter = GameObject.FindGameObjectWithTag("Filter");
+        var changeFilter = filter.GetComponent<Renderer>();
+        changeFilter.material = filterMaterial;
     }
 
     public void ResetSelection()
@@ -189,6 +231,11 @@ public class GameVariables : MonoBehaviour
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
             tracked.GetComponent<PipeClick>().broken = 0;
+            if (tracked.tag == "Filter")
+            {
+                filterBroke = true;
+                changeMaterial.material.SetColor("_Color", Color.red);
+            }
         }
         //TODO: Clean up to function calls for each type of pipe
         foreach (GameObject pipe in Pipes)
@@ -239,6 +286,10 @@ public class GameVariables : MonoBehaviour
                 tracked.GetComponent<PipeClick>().broken = 1;
                 fixedPipe = true;
                 pipegraph[tracked.GetComponent<PipeClick>().order] = new List<int>(tracked.GetComponent<PipeClick>().neighbors);
+            }
+            if (tracked.tag == "Filter")
+            {
+                filterBroke = false;
             }
         }
         if(fixedPipe)
@@ -333,11 +384,7 @@ public class GameVariables : MonoBehaviour
         foreach (GameObject tracked in observedObjects)
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
-            if(tracked.tag.Contains("Pipe"))
-            {
-                changeMaterial.material = pipeMaterial;
-                //changeMaterial.material.SetColor("_Color", Color.green);
-            }
+            changeMaterial.material = pipeMaterial;
 
             GameObject[] oracles;
             oracles = GameObject.FindGameObjectsWithTag("Oracle");
@@ -348,6 +395,10 @@ public class GameVariables : MonoBehaviour
             canvas.SetActive(false);
             oraclesPlaced = 0;
         }
+        GameObject filter = GameObject.FindGameObjectWithTag("Filter");
+        var changeFilter = filter.GetComponent<Renderer>();
+        changeFilter.material = filterMaterial;
+        observedObjects.Clear();
     }
     public void ResetAttackerTurn()
     {
@@ -355,12 +406,14 @@ public class GameVariables : MonoBehaviour
         foreach (GameObject tracked in observedObjects)
         {
             var changeMaterial = tracked.GetComponent<Renderer>();
-            if (tracked.tag.Contains("Pipe") && tracked.GetComponent<PipeClick>().flow == 1) //.broken
+            changeMaterial.material = pipeMaterial;
+            if (tracked.tag == "Filter")
             {
-                changeMaterial.material = pipeMaterial;
+                changeMaterial.material = filterMaterial;
             }
             attacksSelected = 0;
         }
+        observedObjects.Clear();
     }
 
     public void EnterPostTurn()
@@ -392,5 +445,9 @@ public class GameVariables : MonoBehaviour
 
         }
     }
-
+    private void StartTurnScreen()
+    {
+        canvas4.SetActive(false);
+        freeze = false;
+    }
 }

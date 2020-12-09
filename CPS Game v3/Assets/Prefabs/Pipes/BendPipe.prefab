@@ -61,8 +61,11 @@ MonoBehaviour:
   gameState: {fileID: 0}
   flow: 1
   broken: 1
+  isTank: 0
   order: 1
+  neighbors: 
   myMaterial: {fileID: 2100000, guid: a53633a1c5ddda646b796684c5e3aad8, type: 2}
+  filterMaterial: {fileID: 2100000, guid: 0b5a64b39788bdf4089f8b401d6bf93b, type: 2}
 --- !u!1001 &8523976030025463699
 PrefabInstance:
   m_ObjectHideFlags: 0

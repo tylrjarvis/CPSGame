@@ -10,6 +10,8 @@ TagManager:
   - Oracle
   - BendPipe
   - StartPipe
+  - Filter
+  - GameState
   layers:
   - Default
   - TransparentFX
